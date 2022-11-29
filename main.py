@@ -6,7 +6,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import flask
 from flask_cors import cross_origin
-
+import joblib
 app = flask.Flask(__name__)
 
 @app.route('/recommender', methods=['GET'])
@@ -21,10 +21,20 @@ def recommenderAPI(request):
     try:
         skills = request.args.get('skills')
         if skills:
+            # Set CORS headers for the preflight request
+            if request.method == 'OPTIONS':
+                # Allows GET requests from any origin with the Content-Type
+                # header and caches preflight response for an 3600s
+                headers = {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET',
+                    'Access-Control-Allow-Headers': 'Content-Type',
+                    'Access-Control-Max-Age': '3600'
+                }
+                return ('', 204, headers)
+            # Set CORS headers for the main request
             headers = {
-            'Content-Type':'application/json',
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Headers': 'Content-Type',
+                'Access-Control-Allow-Origin': '*'
             }
             return flask.make_response(recommender(skills.split(',')), 200, headers)
         # return flask.jsonify(recommender(skills.split(',')))
@@ -36,10 +46,9 @@ def recommenderAPI(request):
 
 
 def recommender(skills): 
-    vectorizer = TfidfVectorizer()
     jobs = pd.read_csv('https://raw.githubusercontent.com/Jesusmaing/jobsRecommender/master/jobsCleaned.csv',encoding='utf-8')
-    tfidf_skills = vectorizer.fit_transform(jobs['skills'].apply(lambda x: ' '.join(x) if type(x) is list else x))
-    #create a list of skills
+    vectorizer = joblib.load("./vectorizer.pkl")
+    tfidf_skills = joblib.load("./tfidf_skills.pkl")
     #to lower case and remove spaces
     skills = [i.lower().strip() for i in skills]
     #remove duplicates
@@ -47,8 +56,7 @@ def recommender(skills):
     #all list of single string
     skills = ' '.join(skills)
     #vectorize the skills
-    skills = vectorizer.transform([skills])
-    
+    skills = vectorizer.transform([skills]) 
     #se calcula la similitud del coseno de la lista de skills dadas con el resto de las listas de skills
     #con eso se va a obtener un vector de similitud con cada uno de los trabajos de la lista de trabajos    
     similarity_list = cosine_similarity(skills, tfidf_skills)
@@ -60,4 +68,3 @@ def recommender(skills):
     return json.dumps(jobs['job'].iloc[sorted_indexes].values[0:20].tolist())
 # app.run(host='0.0.0.0', debug=True)
 
-#app.run()

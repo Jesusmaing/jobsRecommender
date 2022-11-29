@@ -12,7 +12,7 @@
 # below:
 .git
 .gitignore
+#!include:.gitignore
 env/
 *.csv
-
 node_modules
