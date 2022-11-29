@@ -12,5 +12,7 @@
 # below:
 .git
 .gitignore
+env/
+*.csv
 
 node_modules
