@@ -7,5 +7,4 @@ sklearn
 scipy
 matplotlib
 flask
-Flask-Cors
 joblib

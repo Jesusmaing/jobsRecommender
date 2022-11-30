@@ -4,44 +4,22 @@ import numpy as np #operaciones matriciales
 import nltk  as nltk#libreria de procesamiento de lenguaje natural
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-import flask
-from flask_cors import cross_origin
+from flask import Flask, request, jsonify, make_response
 import joblib
-app = flask.Flask(__name__)
+app = Flask(__name__)
 
 @app.route('/recommender', methods=['GET'])
-def testFlask():
-    skills = flask.request.args.get('skills')
-
-
-
-@app.route('/', methods=['GET'])
-@cross_origin(allowed_methods=['GET'])
-def recommenderAPI(request):
+def recommenderAPI():
     try:
-        skills = request.args.get('skills')
-        if skills:
-            # Set CORS headers for the preflight request
-            if request.method == 'OPTIONS':
-                # Allows GET requests from any origin with the Content-Type
-                # header and caches preflight response for an 3600s
-                headers = {
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Methods': 'GET',
-                    'Access-Control-Allow-Headers': 'Content-Type',
-                    'Access-Control-Max-Age': '3600'
-                }
-                return ('', 204, headers)
-            # Set CORS headers for the main request
-            headers = {
-                'Access-Control-Allow-Origin': '*'
-            }
-            return flask.make_response(recommender(skills.split(',')), 200, headers)
+        if request.method == 'GET':
+            skills = request.args.get('skills')
+            if skills:
+                return jsonify(recommender(skills.split(',')))
         # return flask.jsonify(recommender(skills.split(',')))
-        else:
-            return (f'Error: No skills provided. Please specify a skills.', 400)
+            else:
+                return (f'Error: No skills provided. Please specify a skills.', 404)
     except Exception as e:
-        return (f'Error: {e}', 400)
+        return (f'Error: {e}', 404)
 
 
 
@@ -66,5 +44,6 @@ def recommender(skills):
     #para obtener los indices de la mayor similitud
     sorted_indexes = np.argsort(similarity_list[0])[::-1]
     return json.dumps(jobs['job'].iloc[sorted_indexes].values[0:20].tolist())
-# app.run(host='0.0.0.0', debug=True)
 
+if __name__ == '__main__':
+    app.run()
