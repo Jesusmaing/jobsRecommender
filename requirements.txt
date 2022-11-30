@@ -1,0 +1,11 @@
+firebase-admin
+pandas
+numpy
+nltk
+scikit-learn
+sklearn
+scipy
+matplotlib
+flask
+Flask-Cors
+joblib
