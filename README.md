@@ -12,8 +12,9 @@ python -m pip install -r requirements.txt
 python wsgy.py
 ```
 
-# ¿Lo quieres probar?
+# ¿Lo quieres probar? (Hay dos estilos)
 👉🏼 https://jesusmaing.github.io/JobRecommender/
+👉🏼 https://recommendersystem-8431c.web.app/
 ![image](https://user-images.githubusercontent.com/46060501/206534024-d21a2346-18d4-4c45-847f-cfd5e376a3e3.png)
 
 - ✨Magic ✨
